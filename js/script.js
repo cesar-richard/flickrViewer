@@ -19,13 +19,29 @@ $(function(){
 
 			
 function getPhotosFromAlbum(albumId){
-	$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=acf8e0e35f7d224d8f071714e46a851d&photoset_id="+albumId+"&format=json&nojsoncallback=1",
+	$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=acf8e0e35f7d224d8f071714e46a851d&photoset_id="+albumId+"&per_page=8&format=json&nojsoncallback=1",
 	function(data){
 		$("#content").empty();			
 		$("#SetTitle").text(data.photoset.title);
+		$("#content").append("<div page=1>");
 		$.each(data.photoset.photo,function( index, photo ) {
-			$("#content").append("<img height='333px' photoId='"+photo.id+"' src='" + "http://c2.staticflickr.com/" + photo.farm + "/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg'/>");
+			$("#content").append("<img height='333px' photoPage='1' photoId='"+photo.id+"' src='" + "http://c2.staticflickr.com/" + photo.farm + "/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg'/>");
 		});
+		$("#content").append("</div>");
+		if(parseInt(data.photoset.pages) > 1){
+			for (var i = 2; i <= parseInt(data.photoset.pages); i++){
+				$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=acf8e0e35f7d224d8f071714e46a851d&photoset_id="+albumId+"&per_page=8&page="+i+"&format=json&nojsoncallback=1",
+					function(data){
+					page=data.photoset.page;
+					$("#content").append("<div id='page"+page+"' style='display: none;'>");
+					$.each(data.photoset.photo,function( index, photo) {
+						$("#page"+page).append("<img height='333px' photoPage='"+page+"' photoId='"+photo.id+"' src='" + "http://c3.staticflickr.com/" + photo.farm + "/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg'/>");
+					});
+					$("#content").append("</div>");
+				});
+				
+			}
+		}
 		initializeUI();
 	});
 }
@@ -45,7 +61,7 @@ function getAlbums(){
 function initializeUI(){
 	$(".selectedMenu").each(function(){
 		$(this).removeClass().addClass("normalMenu").before($(this).children().clone().removeClass().addClass('hoverMenu'));
-        });
+        });0
 
 
 	$('#navigationMenu li .normalMenu').each(function(){
@@ -93,12 +109,12 @@ function initializeUI(){
 function dispPublicPhotos(){
 	$.getJSON("https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&api_key=acf8e0e35f7d224d8f071714e46a851d&user_id=106549958%40N08&per_page=20&format=json&nojsoncallback=1",
         function(data){
-                $("#navigationMenu").empty();
-		$("#SetTitle").text("Dernières photos");
-                $.each(data.photos.photo,function( index, photo) {
-			$("#content").append("<img height='333px' photoId='"+photo.id+"' src='" + "http://c2.staticflickr.com/" + photo.farm + "/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg'/>");
-                });
-		initializeUI();
+			$("#navigationMenu").empty();
+			$("#SetTitle").text("Dernières photos");
+			$.each(data.photos.photo,function( index, photo) {
+				$("#content").append("<img height='333px' photoId='"+photo.id+"' src='" + "http://c2.staticflickr.com/" + photo.farm + "/" + photo.server + "/" + photo.id + "_" + photo.secret + ".jpg'/>");
+			});
+			initializeUI();
         });	
 }
 
