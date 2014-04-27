@@ -13,9 +13,6 @@ body{
 	height:100%;
 	font-size:12px;
 }
-img{
-	margin-right:2px;
-}
 
 /* Navigation menu styles */
 
@@ -75,4 +72,20 @@ ul li a:visited{
 	font-size:2.5em;
 	font-weight:bold;
 	padding-left:5em;
+}
+
+#content div{
+	display: inline-block;
+}
+
+#content .imgContainer img{
+	height:350px;
+}
+
+#content  .imgContainer{
+	height:350px;
+	max-height:350px;
+	vertical-align:middle;	
+	text-align: center;
+	display: inline-block;
 }
