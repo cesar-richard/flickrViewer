@@ -61,6 +61,10 @@ ul li a:visited{
 }
 
 /* Photo display */
+.loading{
+	padding: 2em;
+	text-align:center;
+}
 
 #navigationMenu{
 	margin:1em;

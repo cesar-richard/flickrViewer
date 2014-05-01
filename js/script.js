@@ -64,7 +64,7 @@ function getPhotosFromAlbum(albumId){
 			$("#content").append("<div id='page1'><div class='imgContainer'><img photoPage='1' photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/></div></div>");
 		});
 		initWaypoints();
-		repaintMenu();
+		//repaintMenu();
 	});
 }
 
@@ -75,7 +75,7 @@ function getAlbums(){
 		$.each(data.photosets.photoset,function( index, album ) {
 			$("#navigationMenu").append("<li><a albumId='" + album.id + "' href=\"#\" class=\"normalMenu\">" + album.title._content + "</a></li>");
 		});
-		repaintMenu();
+		//repaintMenu();
 	});
 }
 
@@ -108,7 +108,7 @@ function initializeUI(){
 	
 	$("#photoHD").css('max-height', .90*$( window ).height()).css('max-width', .90*$( window ).width());
 	
-	repaintMenu();
+	//repaintMenu();
 }
 
 function repaintMenu(){
@@ -128,7 +128,7 @@ function dispPublicPhotos(){
 		$.each(data.photos.photo,function( index, photo) {
 			$("#content").append("<div class='imgContainer'><img photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/></div>");
 		});
-		repaintMenu();
+		//repaintMenu();
 	});
 }
 
