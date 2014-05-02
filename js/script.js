@@ -35,9 +35,9 @@ function initWaypoints(){
 			$('body').append($loading);
 			$.getJSON(getPhotoAPIUrl(actualAlbumId, actualPage+1), function(data){
 				actualPage=parseInt(data.photoset.page);
-				$("#content").append("<div id='page"+actualPage+"' style='display:none;'>");
+				$("#content").append("<div id='page"+actualPage+"' class='imgContainer' style='display:none;'>");
 				$.each(data.photoset.photo,function( index, photo) {
-					$("#page"+actualPage).append("<div class='imgContainer'><img photoPage='"+actualPage+"' photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/></div>");
+					$("#page"+actualPage).append("<img photoPage='"+actualPage+"' photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/>");
 				});
 				$("#content").append("</div>");
 				$("#page"+actualPage).fadeIn( "slow" );
@@ -61,7 +61,7 @@ function getPhotosFromAlbum(albumId){
 		$("#SetTitle").text(data.photoset.title);
 		totalPages = parseInt(data.photoset.pages);		
 		$.each(data.photoset.photo,function( index, photo ) {
-			$("#content").append("<div id='page1'><div class='imgContainer'><img photoPage='1' photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/></div></div>");
+			$("#content").append("<div id='page1' class='imgContainer'><img photoPage='1' photoId='"+photo.id+"' src='"+constructPhotoUrl(photo.id,photo.farm,photo.server,photo.secret)+"'/></div>");
 		});
 		initWaypoints();
 		//repaintMenu();
@@ -83,6 +83,10 @@ function initializeUI(){
 	$( document ).on("click", "#content img", function(event){
 			event.preventDefault();
 			PreviewImage($(this).attr('photoId'));
+	});
+	
+	$( document ).on("click", "#photoHD", function(event){
+		$('#dialog').dialog('close');
 	});
 	
 	$( document ).on('click', '#navigationMenu li', function(){
@@ -136,20 +140,33 @@ PreviewImage = function(photoId) {
 
   //Get the HTML Elements
   imageId = $("#photoHD");
+  imgLoadingId = $("#imgLoading");
+  
+  imgLoadingId.show();
+  imageId.hide();
+  
+      $('#dialog').dialog({
+      modal: true,
+      resizable: false,
+      draggable: false,
+      height: 'auto',
+      width:  'auto',
+      title: $("#SetTitle").text(),
+	  position: 'center'
+    });
 
   //Set the image src
   getPhotoSize(photoId,"Original",imageId.attr('id'));
 
   //When the image has loaded, display the dialog
   imageId.load(function(){
-
-    $('#dialog').dialog({
-      modal: true,
-      resizable: false,
-      draggable: false,
-      height: 'auto',
-      width:  'auto',
-      title: $("#SetTitle").text()
+	imgLoadingId.hide();
+	imageId.show();
+	$(".ui-dialog").position({
+		my: 'center',
+		at: 'center',
+		of: window,
+		collision: 'fit'
     });
   });   
 }
