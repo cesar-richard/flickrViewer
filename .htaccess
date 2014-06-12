@@ -1,4 +1,10 @@
 Options +FollowSymLinks
 RewriteEngine On
 
-RewriteRule (.+)/(.+)/$ #/$1/$2/
+#Public access
+RewriteRule ^albums/([^/.]*)[/]?$ func.php?album=$1 [L,NE]
+RewriteRule ^photos/([^/.]*)/([^/.]*)[/]?$ func.php?album=$1&photo=$2 [L,NE]
+
+#API access
+RewriteRule ^api/album/([^/.]*)[/]?$ func.php?rel&album=$1 [L,NE]
+RewriteRule ^api/photo/([^/.]*)/([^/.]*)[/]?$ func.php?rel&album=$1&photo=$2 [L,NE]
