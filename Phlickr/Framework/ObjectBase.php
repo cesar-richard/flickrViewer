@@ -22,9 +22,9 @@
 /**
  * This class implements IObjectBase.
  */
-require_once 'Phlickr/Framework/IObjectBase.php';
+//require_once 'Phlickr/Framework/IObjectBase.php';
 
-abstract class Phlickr_Framework_ObjectBase implements Phlickr_Framework_IObjectBase {
+abstract class Phlickr_Framework_ObjectBase{// implements Phlickr_Framework_IObjectBase {
     /**
      * Reference to the API.
      *

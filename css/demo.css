@@ -12,6 +12,7 @@ body{
 	background-color: #141414; 
 	height:100%;
 	font-size:12px;
+	position: relative;
 }
 
 /* Navigation menu styles */
@@ -92,4 +93,13 @@ ul li a:visited{
 	vertical-align:middle;	
 	text-align: center;
 	display: inline-block;
+}
+
+#loadingNotif{
+	position: absolute;
+	z-index: 10;
+	bottom:0;
+	width: 100%;
+	background: rgba(15,15,15,.8);
+	display: none;
 }

@@ -9,6 +9,10 @@
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script src="js/jquery-ui-1.10.4.custom.min.js"></script>
 		<script src="js/waypoints.min.js"></script>
+		<script type="text/javascript">
+			var actualAlbumId = "<?php echo isset($_REQUEST['album'])?$_REQUEST['album']:'0'; ?>";
+			var actualPhoto = "<?php echo isset($_REQUEST['photo'])?$_REQUEST['photo']:'0'; ?>";
+		</script>
 		<script type="text/javascript" src="js/script.js"></script>
 	</head>
 	<body>

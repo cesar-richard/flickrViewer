@@ -1,19 +1,21 @@
 var actualPage = 1;
 var totalPages = 1;
-var actualAlbumId = 0;
+var prevLocation = '';
 $(function () {
     getAlbums();
-	
-	dispPublicPhotos();
+	if(actualAlbumId==0){
+		dispPublicPhotos();
+	}else{
+		getPhotosFromAlbum(actualAlbumId);
+	}
     $.ajaxSetup( {
         "error" : function () {
             $("#content").append("Such problems");
         }
-    }
-    );
-     initializeUI();
-}
-);
+    });
+	getAlbums();
+    initializeUI();
+});
 function getPhotoAPIUrl(albumId, page) {
     return "https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=acf8e0e35f7d224d8f071714e46a851d&photoset_id=" + albumId + "&per_page=1&page=" + page + "&format=json&nojsoncallback=1";
 }
@@ -32,7 +34,7 @@ function initWaypoints() {
                 actualPage = parseInt(data.photoset.page);
                 $("#content").append("<div id='page" + actualPage + "' class='imgContainer' style='display:none;'>");
                 $.each(data.photoset.photo, function ( index, photo) {
-                    $("#page" + actualPage).append("<a rel='tab' href='func.php?rel&album="+actualAlbumId+"&photo="+photo.id+"'><img photoPage='" + actualPage + "' photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></a>");
+                    $("#page" + actualPage).append("<a rel='tab' href='photos/"+photo.id+"'><img photoPage='" + actualPage + "' photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></a>");
                 }
                 );
                 $("#content").append("</div>");
@@ -54,14 +56,19 @@ function getPhotosFromAlbum(albumId) {
     actualAlbumId = albumId;
     $.getJSON(getPhotoAPIUrl(albumId, 1), function (data) {
         $("#content").empty();
+		if(data.stat == "ok"){
         $("#SetTitle").text(data.photoset.title);
         totalPages = parseInt(data.photoset.pages);
         $.each(data.photoset.photo, function ( index, photo) {
-            $("#content").append("<div id='page1' class='imgContainer'><a rel='tab' href='func.php?rel&album="+albumId+"&photo="+photo.id+"'><img photoPage='1' photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></a></div>");
+            $("#content").append("<div id='page1' class='imgContainer'><a rel='tab' href='photos/"+photo.id+"'><img photoPage='1' photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></a></div>");
         }
         );
+		 getAlbums();
          initWaypoints();
         //repaintMenu();
+		}else{
+			alert('Erreur d\'Album Id');
+		}
     }
     );
 }
@@ -69,7 +76,7 @@ function getAlbums() {
     $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key=acf8e0e35f7d224d8f071714e46a851d&user_id=106549958%40N08&format=json&nojsoncallback=1", function (data) {
         $("#navigationMenu").empty();
         $.each(data.photosets.photoset, function ( index, album) {
-            $("#navigationMenu").append("<li><a albumId='" + album.id + "' href=\"#\" class=\"normalMenu\">" + album.title._content + "</a></li>");
+            $("#navigationMenu").append("<li><a albumId='" + album.id + "' href=\"albums/" + album.id + "\" class=\"normalMenu\">" + album.title._content + "</a></li>");
         }
         );
         repaintMenu();
@@ -79,29 +86,25 @@ function getAlbums() {
 function initializeUI() {
     $(document).on("click", "#content img", function (event) {
         event.preventDefault();
+		//get the link location that was clicked
+		pageurl = "photos/"+$(this).attr("photoId");
+		prevLocation = window.location.href;
+		//to change the browser URL to 'pageurl'
+		window.history.pushState({path:pageurl},'',pageurl);
         PreviewImage($(this).attr('photoId'));
     }
     );
 	
-	$(document).on('click',"a[rel='tab']",function (event){
-		//get the link location that was clicked
-		pageurl = $(this).attr('href');
-		
-		//to get the ajax content and display in div with id 'content'
-		$.ajax({url:pageurl+'?rel=tab',success: function(data){
-			$('#content').html(data);
-		}});
-		
-		//to change the browser URL to 'pageurl'
-		if(pageurl!=window.location){
-			window.history.pushState({path:pageurl},'',pageurl);	
-		}
-		return false;
-	});
-	
     $(document).on("click", "#photoHD", function (event) {
         $('#dialog').dialog('close');
+		if(prevLocation!=window.location){
+			window.history.pushState({path:pageurl},'',prevLocation);	
+		}
     });
+	
+	$(document).on("dialogclose", "#dialog", function(event) {
+			window.history.pushState({path:pageurl},'',prevLocation);
+	});
 	
 	$( window ).resize(function() {
 		$("#photoHD").css('max-height', .90 * $(window).height()).css('max-width', .90 * $(window).width());
@@ -119,10 +122,19 @@ function initializeUI() {
             $("#navigationMenu li a[albumId=" + id + "]").before($(this).clone().removeClass().addClass('hoverMenu'));
         }
         );
+
         id = $(this).children().attr("albumId");
+		//get the link location that was clicked
+		pageurl = $(this).children().first().attr('href');
+				
+		//to change the browser URL to 'pageurl'
+		if(pageurl!=window.location){
+			window.history.pushState({path:pageurl},'',pageurl);	
+		}
         getPhotosFromAlbum(id);
         $("#navigationMenu li a[albumId=\"" + id + "\"].hoverMenu").remove();
         $("#navigationMenu li a[albumId=" + id + "]").removeClass().addClass("selectedMenu");
+		return false;
     }
     );
     $(document).on('mouseenter', '#navigationMenu li', function () {
@@ -157,7 +169,7 @@ function dispPublicPhotos() {
         $("#navigationMenu").empty();
         $("#SetTitle").text("Dernières photos");
         $.each(data.photos.photo, function ( index, photo) {
-            $("#content").append("<div class='imgContainer'><img photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></div>");
+            $("#content").append("<div class='imgContainer'><a rel='tab' href='photos/"+photo.id+"'><img photoId='" + photo.id + "' src='" + constructPhotoUrl(photo.id, photo.farm, photo.server, photo.secret) + "'/></a></div>");
         }
         );
         //repaintMenu();
@@ -202,8 +214,6 @@ getPhotoSize = function (photoId, wishedSize, imageId) {
             if (size.label == wishedSize) {
                 $("#" + imageId).attr('src', size.source);
             }
-        }
-        );
-    }
-    );
+        });
+    });
 }
