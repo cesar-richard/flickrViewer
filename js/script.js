@@ -1,6 +1,7 @@
 var actualPage = 1;
 var totalPages = 1;
 var actualAlbumId = 0;
+var albumList;
 
 $(function(){
 
@@ -72,6 +73,7 @@ function getAlbums(){
 	$.getJSON("https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key=acf8e0e35f7d224d8f071714e46a851d&user_id=106549958%40N08&format=json&nojsoncallback=1",
 	function(data){
 		$("#navigationMenu").empty();
+		albumList = data.photosets;
 		$.each(data.photosets.photoset,function( index, album ) {
 			$("#navigationMenu").append("<li><a albumId='" + album.id + "' href=\"#\" class=\"normalMenu\">" + album.title._content + "</a></li>");
 		});
