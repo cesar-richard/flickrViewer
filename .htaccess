@@ -1,0 +1,6 @@
+Options +FollowSymLinks
+RewriteEngine on
+
+#Public access
+RewriteRule ^albums/([^/.]*)[/]?$ index.php?album=$1 [L,NE]
+RewriteRule ^photos/([^/.]*)[/]?$ showPic.php?photo=$1 [L,NE]
